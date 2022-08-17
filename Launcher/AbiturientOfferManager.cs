@@ -7,34 +7,57 @@ namespace SilentThief
     public class AbiturientOfferManager
     {
         private static readonly HttpClient _client = new HttpClient();
-        private static readonly List<int> _allowedStatuses = new List<int> { 1, 5, 6 };
+        private static readonly List<int> _allowedStatuses = new List<int> 
+        { 
+            OfferStatus.CameFromSite,
+            OfferStatus.Registered,
+            OfferStatus.Admitted,
+            OfferStatus.Recommended
+        };
 
         public static async Task<SpecialityCompetitionStats> GetStatsFor(SpecialityInfo specialityInfo, double secondPriorityUpperLimit = -1)
         {
             var abiturients = await GetAbiturients(specialityInfo.Code);
-            // Вилучаємо всі заявки, що не мають одного з статусів: заява надійшла з сайту, зареєстровано, допущено.
             abiturients.RemoveAll(a => !_allowedStatuses.Contains(a.StatusId));
             // Вилучаємо контрактні заявки
             abiturients.RemoveAll(a => a.Priority == 0);
-            // Вилучаємо рекомендованих
-            var recomendedAbiturients = abiturients.Where(a => a.StatusId == 9).ToList();
-            abiturients.RemoveAll(a => recomendedAbiturients.Contains(a));
 
+            // Співбесіда
+            var interviewPassedAbiturients = abiturients.Where(a => a.StatusId == OfferStatus.Recommended
+                && a.Subjects.Any(s => s.Name.Contains("Співбесіда"))).ToList();
+            abiturients.RemoveAll(a => interviewPassedAbiturients.Contains(a));
+
+            // Квота-2
             var quota2Abiturients = abiturients.Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 2"))).ToList();
-            var quota2PassedAbiturients = RunCompetition(quota2Abiturients, specialityInfo.Quota2BudgetPlaces,
-                secondPriorityUpperLimit);
+            var quota2PassedAbiturients = quota2Abiturients.Where(a => a.StatusId == OfferStatus.Recommended).ToList();
+            if (!quota2PassedAbiturients.Any())
+            {
+                quota2PassedAbiturients = RunCompetition(quota2Abiturients, specialityInfo.Quota2BudgetPlaces,
+                    secondPriorityUpperLimit);
+            }
             abiturients.RemoveAll(a => quota2PassedAbiturients.Contains(a));
+            //PrintAbiturients(quota2PassedAbiturients);
 
+            // Квота 1
             var quota1Abiturients = abiturients.Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 1"))).ToList();
-            var quota1PassedAbiturients = RunCompetition(quota1Abiturients, specialityInfo.Quota1BudgetPlaces);
+            var quota1PassedAbiturients = quota1Abiturients.Where(a => a.StatusId == OfferStatus.Recommended).ToList();
+            if (!quota1PassedAbiturients.Any())
+            {
+                quota1PassedAbiturients = RunCompetition(quota1Abiturients, specialityInfo.Quota1BudgetPlaces);
+            }
             abiturients.RemoveAll(a => quota1PassedAbiturients.Contains(a));
+            //PrintAbiturients(quota1PassedAbiturients);
 
+            // Звичайні абітурієнти
+            var passedAbiturients = abiturients.Where(a => a.StatusId == OfferStatus.Recommended).ToList();
             var freePlaces = (specialityInfo.Quota1BudgetPlaces - quota1PassedAbiturients.Count)
-                + (specialityInfo.Quota2BudgetPlaces - quota2PassedAbiturients.Count);
-            //var freePlaces = 0;
-            var passedAbiturients = RunCompetition(abiturients, 
-                specialityInfo.BudgetPlaces + freePlaces - recomendedAbiturients.Count,
-                secondPriorityUpperLimit);
+                    + (specialityInfo.Quota2BudgetPlaces - quota2PassedAbiturients.Count)
+                    - interviewPassedAbiturients.Count;
+            if (!passedAbiturients.Any())
+            {                
+                passedAbiturients = RunCompetition(abiturients, specialityInfo.BudgetPlaces + freePlaces,
+                    secondPriorityUpperLimit);
+            }
             //PrintAbiturients(passedAbiturients);
 
             return new SpecialityCompetitionStats()
@@ -50,7 +73,7 @@ namespace SilentThief
                 Quota2PassingScore = quota2PassedAbiturients.Count >= specialityInfo.Quota2BudgetPlaces
                     ? quota2PassedAbiturients.Last().Score
                     : -1,
-                GeneralPassingScore = passedAbiturients.Count >= specialityInfo.BudgetPlaces
+                GeneralPassingScore = passedAbiturients.Count >= specialityInfo.BudgetPlaces + freePlaces
                     ? passedAbiturients.Last().Score
                     : -1
             };

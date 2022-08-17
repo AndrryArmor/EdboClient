@@ -15,9 +15,9 @@
         {
             Name = "126",
             Code = "988213",
-            BudgetPlaces = 208,
+            BudgetPlaces = 209,
             Quota1BudgetPlaces = 12,
-            Quota2BudgetPlaces = 25
+            Quota2BudgetPlaces = 24
         };
 
         public static readonly SpecialityInfo Fice123 = new SpecialityInfo()
