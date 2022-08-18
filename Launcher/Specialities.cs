@@ -8,7 +8,7 @@
             Code = "986240",
             BudgetPlaces = 141,
             Quota1BudgetPlaces = 8,
-            Quota2BudgetPlaces = 16
+            Quota2BudgetPlaces = 17
         };
 
         public static readonly SpecialityInfo Fice126 = new SpecialityInfo()
@@ -17,7 +17,7 @@
             Code = "988213",
             BudgetPlaces = 209,
             Quota1BudgetPlaces = 12,
-            Quota2BudgetPlaces = 24
+            Quota2BudgetPlaces = 25
         };
 
         public static readonly SpecialityInfo Fice123 = new SpecialityInfo()
