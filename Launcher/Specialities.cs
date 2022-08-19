@@ -11,6 +11,15 @@
             Quota2BudgetPlaces = 17
         };
 
+        public static readonly SpecialityInfo Fice121Correspondence = new SpecialityInfo()
+        {
+            Name = "121 (заочка)",
+            Code = "986243",
+            BudgetPlaces = 10,
+            Quota1BudgetPlaces = 0,
+            Quota2BudgetPlaces = 1
+        };
+
         public static readonly SpecialityInfo Fice126 = new SpecialityInfo()
         {
             Name = "126",

@@ -69,15 +69,15 @@ namespace SilentThief
                 SecondPriorityUpperLimit = secondPriorityUpperLimit,
                 Quota1PassingScore = quota1PassedAbiturients.Any(a => a.StatusId == OfferStatus.Recommended) || 
                     quota1PassedAbiturients.Count >= specialityInfo.Quota1BudgetPlaces
-                    ? quota1PassedAbiturients.Last().Score
+                    ? quota1PassedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1,
                 Quota2PassingScore = quota2PassedAbiturients.Any(a => a.StatusId == OfferStatus.Recommended) ||
                     quota2PassedAbiturients.Count >= specialityInfo.Quota2BudgetPlaces
-                    ? quota2PassedAbiturients.Last().Score
+                    ? quota2PassedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1,
                 GeneralPassingScore = passedAbiturients.Any(a => a.StatusId == OfferStatus.Recommended) ||
                     passedAbiturients.Count >= specialityInfo.BudgetPlaces + freePlaces
-                    ? passedAbiturients.Last().Score
+                    ? passedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1
             };
         }
