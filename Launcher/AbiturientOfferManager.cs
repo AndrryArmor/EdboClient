@@ -12,7 +12,13 @@ namespace SilentThief
             OfferStatus.CameFromSite,
             OfferStatus.Registered,
             OfferStatus.Admitted,
-            OfferStatus.Recommended
+            OfferStatus.Recommended,
+            OfferStatus.IncludedToOrder
+        };
+        private static readonly List<int> _greenStatuses = new List<int>()
+        {
+            OfferStatus.Recommended,
+            OfferStatus.IncludedToOrder
         };
 
         public static async Task<SpecialityCompetitionStats> GetStatsFor(SpecialityInfo specialityInfo, double secondPriorityUpperLimit = -1)
@@ -23,13 +29,13 @@ namespace SilentThief
             abiturients.RemoveAll(a => a.Priority == 0);
 
             // Співбесіда
-            var interviewPassedAbiturients = abiturients.Where(a => a.StatusId == OfferStatus.Recommended
+            var interviewPassedAbiturients = abiturients.Where(a => _greenStatuses.Contains(a.StatusId)
                 && a.Subjects.Any(s => s.Name.Contains("Співбесіда"))).ToList();
             abiturients.RemoveAll(a => interviewPassedAbiturients.Contains(a));
 
             // Квота-2
             var quota2Abiturients = abiturients.Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 2"))).ToList();
-            var quota2PassedAbiturients = quota2Abiturients.Where(a => a.StatusId == OfferStatus.Recommended).ToList();
+            var quota2PassedAbiturients = quota2Abiturients.Where(a => _greenStatuses.Contains(a.StatusId)).ToList();
             if (!quota2PassedAbiturients.Any())
             {
                 quota2PassedAbiturients = RunCompetition(quota2Abiturients, specialityInfo.Quota2BudgetPlaces,
@@ -40,7 +46,7 @@ namespace SilentThief
 
             // Квота 1
             var quota1Abiturients = abiturients.Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 1"))).ToList();
-            var quota1PassedAbiturients = quota1Abiturients.Where(a => a.StatusId == OfferStatus.Recommended).ToList();
+            var quota1PassedAbiturients = quota1Abiturients.Where(a => _greenStatuses.Contains(a.StatusId)).ToList();
             if (!quota1PassedAbiturients.Any())
             {
                 quota1PassedAbiturients = RunCompetition(quota1Abiturients, specialityInfo.Quota1BudgetPlaces);
@@ -49,7 +55,7 @@ namespace SilentThief
             //PrintAbiturients(quota1PassedAbiturients);
 
             // Звичайні абітурієнти
-            var passedAbiturients = abiturients.Where(a => a.StatusId == OfferStatus.Recommended).ToList();
+            var passedAbiturients = abiturients.Where(a => _greenStatuses.Contains(a.StatusId)).ToList();
             var freePlaces = (specialityInfo.Quota1BudgetPlaces - quota1PassedAbiturients.Count)
                     + (specialityInfo.Quota2BudgetPlaces - quota2PassedAbiturients.Count)
                     - interviewPassedAbiturients.Count;
@@ -67,15 +73,15 @@ namespace SilentThief
                 Quota2AbiturientsCount = quota2Abiturients.Count,
                 SimpleAbiturientsCount = abiturients.Count,
                 SecondPriorityUpperLimit = secondPriorityUpperLimit,
-                Quota1PassingScore = quota1PassedAbiturients.Any(a => a.StatusId == OfferStatus.Recommended) || 
+                Quota1PassingScore = quota1PassedAbiturients.Any(a => _greenStatuses.Contains(a.StatusId)) || 
                     quota1PassedAbiturients.Count >= specialityInfo.Quota1BudgetPlaces
                     ? quota1PassedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1,
-                Quota2PassingScore = quota2PassedAbiturients.Any(a => a.StatusId == OfferStatus.Recommended) ||
+                Quota2PassingScore = quota2PassedAbiturients.Any(a => _greenStatuses.Contains(a.StatusId)) ||
                     quota2PassedAbiturients.Count >= specialityInfo.Quota2BudgetPlaces
                     ? quota2PassedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1,
-                GeneralPassingScore = passedAbiturients.Any(a => a.StatusId == OfferStatus.Recommended) ||
+                GeneralPassingScore = passedAbiturients.Any(a => _greenStatuses.Contains(a.StatusId)) ||
                     passedAbiturients.Count >= specialityInfo.BudgetPlaces + freePlaces
                     ? passedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1
