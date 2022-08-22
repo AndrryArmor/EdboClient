@@ -27,6 +27,8 @@ namespace SilentThief
             abiturients.RemoveAll(a => !_allowedStatuses.Contains(a.StatusId));
             // Вилучаємо контрактні заявки
             abiturients.RemoveAll(a => a.Priority == 0);
+            // Сортування за спаданням
+            abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
 
             // Співбесіда
             var interviewPassedAbiturients = abiturients.Where(a => _greenStatuses.Contains(a.StatusId)
@@ -132,7 +134,7 @@ namespace SilentThief
             int availablePlaces, double secondPriorityUpperLimit = -1)
         {
             // Сортування за спаданням
-            abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
+            //abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
             var passedAbiturients = abiturients
                 .Where(a => a.Priority == 1 || (a.Priority == 2 && a.Score <= secondPriorityUpperLimit))
                 .Take(availablePlaces)
