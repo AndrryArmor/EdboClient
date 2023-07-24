@@ -5,37 +5,37 @@
         public static readonly SpecialityInfo Fice121 = new SpecialityInfo()
         {
             Name = "121",
-            Code = "986240",
-            BudgetPlaces = 141,
-            Quota1BudgetPlaces = 8,
-            Quota2BudgetPlaces = 17
+            Code = "1138191",
+            BudgetPlaces = 180,
+            Quota1BudgetPlaces = 17,
+            Quota2BudgetPlaces = 33
         };
 
         public static readonly SpecialityInfo Fice121Correspondence = new SpecialityInfo()
         {
             Name = "121 (заочка)",
-            Code = "986243",
-            BudgetPlaces = 10,
-            Quota1BudgetPlaces = 0,
-            Quota2BudgetPlaces = 1
+            Code = "1138194",
+            BudgetPlaces = 11,
+            Quota1BudgetPlaces = 1,
+            Quota2BudgetPlaces = 2
         };
 
         public static readonly SpecialityInfo Fice126 = new SpecialityInfo()
         {
             Name = "126",
-            Code = "988213",
-            BudgetPlaces = 209,
-            Quota1BudgetPlaces = 12,
-            Quota2BudgetPlaces = 25
+            Code = "1140344",
+            BudgetPlaces = 270,
+            Quota1BudgetPlaces = 14,
+            Quota2BudgetPlaces = 27
         };
 
         public static readonly SpecialityInfo Fice123 = new SpecialityInfo()
         {
             Name = "123",
-            Code = "985216",
-            BudgetPlaces = 140,
-            Quota1BudgetPlaces = 8,
-            Quota2BudgetPlaces = 17
+            Code = "1137347",
+            BudgetPlaces = 180,
+            Quota1BudgetPlaces = 15,
+            Quota2BudgetPlaces = 29
         };
     }
 }
