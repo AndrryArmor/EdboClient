@@ -1,16 +1,11 @@
 ﻿namespace SilentThief
 {
-    public struct SpecialityInfo
+    public sealed record SpecialityInfo
     {
         public string Name { get; set; } = string.Empty;
         public string Code { get; set; } = string.Empty;
-        public int BudgetPlaces { get; set; } = default;
-        public int Quota1BudgetPlaces { get; set; } = default;
-        public int Quota2BudgetPlaces { get; set; } = default;
-
-        public SpecialityInfo()
-        {
-
-        }
+        public int BudgetPlaces { get; set; }
+        public int Quota1BudgetPlaces { get; set; }
+        public int Quota2BudgetPlaces { get; set; }
     }
 }
