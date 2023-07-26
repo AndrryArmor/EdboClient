@@ -2,13 +2,13 @@
 using System.Text;
 using System.Text.Json;
 
-namespace SilentThief
+namespace EdboClient.Launcher
 {
     public class AbiturientOfferManager
     {
         private static readonly HttpClient _client = new HttpClient();
-        private static readonly List<int> _allowedStatuses = new List<int> 
-        { 
+        private static readonly List<int> _allowedStatuses = new List<int>
+        {
             OfferStatus.CameFromSite,
             OfferStatus.Registered,
             OfferStatus.Admitted,
@@ -58,11 +58,11 @@ namespace SilentThief
 
             // Звичайні абітурієнти
             var passedAbiturients = abiturients.Where(a => _greenStatuses.Contains(a.StatusId)).ToList();
-            var freePlaces = (specialityInfo.Quota1BudgetPlaces - quota1PassedAbiturients.Count)
+            var freePlaces = specialityInfo.Quota1BudgetPlaces - quota1PassedAbiturients.Count
                     + (specialityInfo.Quota2BudgetPlaces - quota2PassedAbiturients.Count)
                     - interviewPassedAbiturients.Count;
             if (!passedAbiturients.Any())
-            {                
+            {
                 passedAbiturients = RunCompetition(abiturients, specialityInfo.BudgetPlaces + freePlaces,
                     secondPriorityUpperLimit);
             }
@@ -75,7 +75,7 @@ namespace SilentThief
                 Quota2AbiturientsCount = quota2Abiturients.Count,
                 SimpleAbiturientsCount = abiturients.Count,
                 SecondPriorityUpperLimit = secondPriorityUpperLimit,
-                Quota1PassingScore = quota1PassedAbiturients.Any(a => _greenStatuses.Contains(a.StatusId)) || 
+                Quota1PassingScore = quota1PassedAbiturients.Any(a => _greenStatuses.Contains(a.StatusId)) ||
                     quota1PassedAbiturients.Count >= specialityInfo.Quota1BudgetPlaces
                     ? quota1PassedAbiturients.LastOrDefault()?.Score ?? -1
                     : -1,
@@ -108,7 +108,7 @@ namespace SilentThief
             }
             foreach (var stats in statsList)
             {
-                var lastAbiturientScore = 
+                var lastAbiturientScore =
                 result.AppendLine($"Непрохідний по квоті 1: {stats.Quota1PassingScore}");
                 if (stats.SecondPriorityUpperLimit == -1)
                 {
@@ -136,7 +136,7 @@ namespace SilentThief
             // Сортування за спаданням
             //abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
             var passedAbiturients = abiturients
-                .Where(a => a.Priority == 1 || (a.Priority == 2 && a.Score <= secondPriorityUpperLimit))
+                .Where(a => a.Priority == 1 || a.Priority == 2 && a.Score <= secondPriorityUpperLimit)
                 .Take(availablePlaces)
                 .ToList();
             return passedAbiturients;
@@ -145,7 +145,7 @@ namespace SilentThief
         private static void PrintAbiturients(List<AbiturientOffer> abiturients)
         {
             var result = new StringBuilder();
-            result.AppendLine($"{"Номер", 5} | {"Ім'я", 25} | {"Статус", 6} | {"Пріоритет", 9} | {"Бали", 7} | {"Квота", 22}");
+            result.AppendLine($"{"Номер",5} | {"Ім'я",25} | {"Статус",6} | {"Пріоритет",9} | {"Бали",7} | {"Квота",22}");
             for (int i = 0; i < abiturients.Count; i++)
             {
                 result.AppendLine($"{i + 1,5} | {abiturients[i].Name,25} | {abiturients[i].StatusId,6} | {abiturients[i].Priority,9} | {abiturients[i].Score,7} | " +

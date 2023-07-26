@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SilentThief
+namespace EdboClient.Launcher
 {
     public class Subject
     {

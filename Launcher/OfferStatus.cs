@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SilentThief
+namespace EdboClient.Launcher
 {
     public static class OfferStatus
     {

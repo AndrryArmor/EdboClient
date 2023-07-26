@@ -1,4 +1,4 @@
-﻿namespace SilentThief
+﻿namespace EdboClient.Launcher
 {
     public class Specialities
     {
