@@ -145,12 +145,12 @@ namespace SilentThief
         private static void PrintAbiturients(List<AbiturientOffer> abiturients)
         {
             var result = new StringBuilder();
-            result.AppendLine($"{"Ім'я", 25} | {"Статус", 6} | {"Пріоритет", 9} | {"Бали", 7} | {"Квота", 22}");
-            abiturients.ForEach(a =>
+            result.AppendLine($"{"Номер", 5} | {"Ім'я", 25} | {"Статус", 6} | {"Пріоритет", 9} | {"Бали", 7} | {"Квота", 22}");
+            for (int i = 0; i < abiturients.Count; i++)
             {
-                result.AppendLine($"{a.Name, 25} | {a.StatusId, 6} | {a.Priority, 9} | {a.Score, 7} | " +
-                    $"{string.Join(", ", a.Subjects.Select(s => s.Name)), 22}");
-            });
+                result.AppendLine($"{i + 1,5} | {abiturients[i].Name,25} | {abiturients[i].StatusId,6} | {abiturients[i].Priority,9} | {abiturients[i].Score,7} | " +
+                    $"{string.Join(", ", abiturients[i].Subjects.Select(s => s.Name)),22}");
+            }
             result.AppendLine("---------------------------------------------------------------------------------");
             Console.WriteLine(result.ToString());
             //var filePath = Path.GetTempFileName();
