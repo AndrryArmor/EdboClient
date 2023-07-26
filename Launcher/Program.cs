@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SilentThief
+namespace EdboClient.Launcher
 {
     internal class Program
     {

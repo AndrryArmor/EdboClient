@@ -1,10 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SilentThief
+namespace EdboClient.Launcher
 {
     public class AbiturientOffer
     {
-        [JsonPropertyName("prid")]        
+        [JsonPropertyName("prid")]
         public int Id { get; set; }
 
         [JsonPropertyName("n")]

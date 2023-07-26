@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SilentThief
+﻿namespace EdboClient.Launcher
 {
-    public struct SpecialityInfo
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Code { get; set; } = string.Empty;
-        public int BudgetPlaces { get; set; }
-        public int Quota1BudgetPlaces { get; set; }
-        public int Quota2BudgetPlaces { get; set; }
-    }
+    public record struct SpecialityInfo(string Name, string Code, int BudgetPlaces, int Quota1BudgetPlaces, int Quota2BudgetPlaces);
 }
