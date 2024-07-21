@@ -86,18 +86,9 @@ public class AbiturientOfferManager
             Quota2AbiturientsCount = quota2Abiturients.Count,
             SimpleAbiturientsCount = abiturients.Count,
             SecondPriorityUpperLimit = secondPriorityUpperLimit,
-            Quota1PassingScore = quota1PassedAbiturients.Any(a => _greenStatuses.Contains(a.Status)) ||
-                quota1PassedAbiturients.Count >= specialityInfo.Quota1BudgetPlaces
-                ? quota1PassedAbiturients.LastOrDefault()?.Score ?? -1
-                : -1,
-            Quota2PassingScore = quota2PassedAbiturients.Any(a => _greenStatuses.Contains(a.Status)) ||
-                quota2PassedAbiturients.Count >= specialityInfo.Quota2BudgetPlaces
-                ? quota2PassedAbiturients.LastOrDefault()?.Score ?? -1
-                : -1,
-            GeneralPassingScore = passedAbiturients.Any(a => _greenStatuses.Contains(a.Status)) ||
-                passedAbiturients.Count >= specialityInfo.BudgetPlaces + freePlaces
-                ? passedAbiturients.LastOrDefault()?.Score ?? -1
-                : -1
+            Quota1PassingScore = GetPassingScore(quota1PassedAbiturients, specialityInfo.Quota1BudgetPlaces),
+            Quota2PassingScore = GetPassingScore(quota2PassedAbiturients, specialityInfo.Quota2BudgetPlaces),
+            GeneralPassingScore = GetPassingScore(passedAbiturients, specialityInfo.BudgetPlaces + freePlaces),
         };
     }
 
@@ -147,6 +138,13 @@ public class AbiturientOfferManager
             .Take(availablePlaces)
             .ToList();
         return passedAbiturients;
+    }
+
+    private static double GetPassingScore(ICollection<AbiturientOffer> abiturients, int budgetPlacesCount)
+    {
+        return abiturients.Any(a => _greenStatuses.Contains(a.Status)) || abiturients.Count >= budgetPlacesCount
+                ? abiturients.LastOrDefault()?.Score ?? -1
+                : -1;
     }
 
     private static void PrintAbiturients(IEnumerable<AbiturientOffer> abiturients)
