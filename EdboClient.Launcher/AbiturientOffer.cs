@@ -1,28 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EdboClient.Launcher
-{
-    public class AbiturientOffer
-    {
-        [JsonPropertyName("prid")]
-        public int Id { get; set; }
+namespace EdboClient.Launcher;
 
-        [JsonPropertyName("n")]
-        public int Position { get; set; }
+public record AbiturientOffer(
+    [property: JsonPropertyName("prid")] int Id,
+    [property: JsonPropertyName("n")] int Position,
+    [property: JsonPropertyName("fio")] string Name,
+    [property: JsonPropertyName("prsid")] OfferStatus Status,
+    [property: JsonPropertyName("p")] int Priority,
+    [property: JsonPropertyName("kv")] double Score,
+    [property: JsonPropertyName("rss")] Subject[] Subjects);
 
-        [JsonPropertyName("fio")]
-        public string Name { get; set; } = string.Empty;
-
-        [JsonPropertyName("prsid")]
-        public int StatusId { get; set; }
-
-        [JsonPropertyName("p")]
-        public int Priority { get; set; }
-
-        [JsonPropertyName("kv")]
-        public double Score { get; set; }
-
-        [JsonPropertyName("rss")]
-        public IEnumerable<Subject> Subjects { get; set; } = new List<Subject>();
-    }
-}
+public record Subject([property: JsonPropertyName("sn")] string Name = "");

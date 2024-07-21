@@ -1,14 +1,13 @@
-﻿namespace EdboClient.Launcher
+﻿namespace EdboClient.Launcher;
+
+public record SpecialityCompetitionStats
 {
-    public class SpecialityCompetitionStats
-    {
-        public string SpecialityName { get; set; } = string.Empty;
-        public int Quota1AbiturientsCount { get; set; }
-        public int Quota2AbiturientsCount { get; set; }
-        public int SimpleAbiturientsCount { get; set; }
-        public double SecondPriorityUpperLimit { get; set; }
-        public double Quota1PassingScore { get; set; }
-        public double Quota2PassingScore { get; set; }
-        public double GeneralPassingScore { get; set; }
-    }
+    public required string SpecialityName { get; init; }
+    public required int Quota1AbiturientsCount { get; init; }
+    public required int Quota2AbiturientsCount { get; init; }
+    public required int SimpleAbiturientsCount { get; init; }
+    public required double SecondPriorityUpperLimit { get; init; }
+    public required double Quota1PassingScore { get; init; }
+    public required double Quota2PassingScore { get; init; }
+    public required double GeneralPassingScore { get; init; }
 }
