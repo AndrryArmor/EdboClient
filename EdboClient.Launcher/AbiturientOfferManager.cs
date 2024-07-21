@@ -69,12 +69,11 @@ public class AbiturientOfferManager
         var passedAbiturients = abiturients
             .Where(a => _greenStatuses.Contains(a.Status))
             .ToList();
-        var freePlaces = specialityInfo.Quota1BudgetPlaces - quota1PassedAbiturients.Count
-                + (specialityInfo.Quota2BudgetPlaces - quota2PassedAbiturients.Count)
-                - interviewPassedAbiturients.Count;
+        var occupiedGeneralBudgetPlaces = interviewPassedAbiturients.Count
+            + quota1PassedAbiturients.Count + quota2PassedAbiturients.Count;
         if (passedAbiturients.Count == 0)
         {
-            passedAbiturients = RunCompetition(abiturients, specialityInfo.BudgetPlaces + freePlaces,
+            passedAbiturients = RunCompetition(abiturients, specialityInfo.BudgetPlaces - occupiedGeneralBudgetPlaces,
                 secondPriorityUpperLimit);
         }
         //PrintAbiturients(passedAbiturients);
@@ -88,7 +87,7 @@ public class AbiturientOfferManager
             SecondPriorityUpperLimit = secondPriorityUpperLimit,
             Quota1PassingScore = GetPassingScore(quota1PassedAbiturients, specialityInfo.Quota1BudgetPlaces),
             Quota2PassingScore = GetPassingScore(quota2PassedAbiturients, specialityInfo.Quota2BudgetPlaces),
-            GeneralPassingScore = GetPassingScore(passedAbiturients, specialityInfo.BudgetPlaces + freePlaces),
+            GeneralPassingScore = GetPassingScore(passedAbiturients, specialityInfo.BudgetPlaces - occupiedGeneralBudgetPlaces),
         };
     }
 
