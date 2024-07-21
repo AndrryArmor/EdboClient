@@ -23,7 +23,7 @@ public class AbiturientOfferManager
 
     public static async Task<SpecialityCompetitionStats> GetStatsFor(SpecialtyInfo specialityInfo, double secondPriorityUpperLimit = -1)
     {
-        var abiturients = await GetAbiturients(specialityInfo.Code);
+        var abiturients = (await GetAbiturients(specialityInfo.Code)).ToList();
         abiturients.RemoveAll(a => !_allowedStatuses.Contains(a.Status));
         // Вилучаємо контрактні заявки
         abiturients.RemoveAll(a => a.Priority == 0);
@@ -31,14 +31,19 @@ public class AbiturientOfferManager
         abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
 
         // Співбесіда
-        var interviewPassedAbiturients = abiturients.Where(a => _greenStatuses.Contains(a.Status)
-            && a.Subjects.Any(s => s.Name.Contains("Співбесіда"))).ToList();
+        var interviewPassedAbiturients = abiturients
+            .Where(a => _greenStatuses.Contains(a.Status) && a.Subjects.Any(s => s.Name.Contains("Співбесіда")))
+            .ToList();
         abiturients.RemoveAll(a => interviewPassedAbiturients.Contains(a));
 
         // Квота-2
-        var quota2Abiturients = abiturients.Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 2"))).ToList();
-        var quota2PassedAbiturients = quota2Abiturients.Where(a => _greenStatuses.Contains(a.Status)).ToList();
-        if (!quota2PassedAbiturients.Any())
+        var quota2Abiturients = abiturients
+            .Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 2")))
+            .ToList();
+        var quota2PassedAbiturients = quota2Abiturients
+            .Where(a => _greenStatuses.Contains(a.Status))
+            .ToList();
+        if (quota2PassedAbiturients.Count == 0)
         {
             quota2PassedAbiturients = RunCompetition(quota2Abiturients, specialityInfo.Quota2BudgetPlaces,
                 secondPriorityUpperLimit);
@@ -47,9 +52,13 @@ public class AbiturientOfferManager
         //PrintAbiturients(quota2PassedAbiturients);
 
         // Квота 1
-        var quota1Abiturients = abiturients.Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 1"))).ToList();
-        var quota1PassedAbiturients = quota1Abiturients.Where(a => _greenStatuses.Contains(a.Status)).ToList();
-        if (!quota1PassedAbiturients.Any())
+        var quota1Abiturients = abiturients
+            .Where(a => a.Subjects.Any(s => s.Name.Contains("Квота 1")))
+            .ToList();
+        var quota1PassedAbiturients = quota1Abiturients
+            .Where(a => _greenStatuses.Contains(a.Status))
+            .ToList();
+        if (quota1PassedAbiturients.Count == 0)
         {
             quota1PassedAbiturients = RunCompetition(quota1Abiturients, specialityInfo.Quota1BudgetPlaces);
         }
@@ -57,11 +66,13 @@ public class AbiturientOfferManager
         //PrintAbiturients(quota1PassedAbiturients);
 
         // Звичайні абітурієнти
-        var passedAbiturients = abiturients.Where(a => _greenStatuses.Contains(a.Status)).ToList();
+        var passedAbiturients = abiturients
+            .Where(a => _greenStatuses.Contains(a.Status))
+            .ToList();
         var freePlaces = specialityInfo.Quota1BudgetPlaces - quota1PassedAbiturients.Count
                 + (specialityInfo.Quota2BudgetPlaces - quota2PassedAbiturients.Count)
                 - interviewPassedAbiturients.Count;
-        if (!passedAbiturients.Any())
+        if (passedAbiturients.Count == 0)
         {
             passedAbiturients = RunCompetition(abiturients, specialityInfo.BudgetPlaces + freePlaces,
                 secondPriorityUpperLimit);
@@ -138,14 +149,14 @@ public class AbiturientOfferManager
         return passedAbiturients;
     }
 
-    private static void PrintAbiturients(List<AbiturientOffer> abiturients)
+    private static void PrintAbiturients(IEnumerable<AbiturientOffer> abiturients)
     {
         var result = new StringBuilder();
         result.AppendLine($"{"Номер", 5} | {"Ім'я", 25} | {"Статус", 15} | {"Пріоритет", 9} | {"Бали", 7} | {"Квота", 22}");
-        for (int i = 0; i < abiturients.Count; i++)
+        foreach (var (abiturient, index) in abiturients.Select((a, i)  => (a, i)))
         {
-            result.AppendLine($"{i + 1, 5} | {abiturients[i].Name, 25} | {abiturients[i].Status, 15} | {abiturients[i].Priority, 9} | {abiturients[i].Score, 7} | " +
-                $"{string.Join(", ", abiturients[i].Subjects.Select(s => s.Name)),22}");
+            result.AppendLine($"{index + 1, 5} | {abiturient.Name, 25} | {abiturient.Status, 15} | {abiturient.Priority, 9} | {abiturient.Score, 7} | " +
+                $"{string.Join(", ", abiturient.Subjects.Select(s => s.Name)),22}");
         }
         result.AppendLine("---------------------------------------------------------------------------------");
         Console.WriteLine(result.ToString());
@@ -157,7 +168,7 @@ public class AbiturientOfferManager
         //}
     }
 
-    private static async Task<List<AbiturientOffer>> GetAbiturients(string specialityCode)
+    private static async Task<IEnumerable<AbiturientOffer>> GetAbiturients(string specialityCode)
     {
         List<AbiturientOffer> abiturientRecords = [];
         AbiturientOffer[]? abiturientRecordsChunk;
