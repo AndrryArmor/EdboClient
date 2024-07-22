@@ -29,6 +29,7 @@ public class AbiturientOfferManager
         abiturients.RemoveAll(a => a.Priority == 0);
         // Сортування за спаданням
         abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
+        //PrintScoreStats(abiturients, 5);
 
         // Співбесіда
         var interviewPassedAbiturients = abiturients
@@ -163,6 +164,33 @@ public class AbiturientOfferManager
         //{
         //    sw.Write(result);
         //}
+    }
+
+    private static void PrintScoreStats(IEnumerable<AbiturientOffer> abiturients, int priorityLowerBound)
+    {
+        var result = new StringBuilder();
+        List<(int LowerBound, int HigherBound, int Count)> scoreStats = [];
+        int lowerBound = 100;
+        int higherBound = 104;
+        int maxScore = 200;
+        int step = 3;
+
+        var abiturientsFiltered = abiturients.Where(a => a.Priority <= priorityLowerBound);
+        while (higherBound <= maxScore)
+        {
+            int abiturientsCount = abiturientsFiltered.Count(a => lowerBound < a.Score && a.Score <= higherBound);
+            scoreStats.Add((lowerBound, higherBound, abiturientsCount));
+            lowerBound = higherBound;
+            higherBound += step;
+        }
+
+        int maxCount = scoreStats.Max(s => s.Count);
+        scoreStats.ForEach(s =>
+        {
+            result.AppendLine($"{s.LowerBound}-{s.HigherBound} | {s.Count, 3} | {new string('█', s.Count)}");
+        });
+        result.AppendLine("---------------------------------------------------------------------------------");
+        Console.WriteLine(result.ToString());
     }
 
     private static async Task<IEnumerable<AbiturientOffer>> GetAbiturients(string specialityCode)
