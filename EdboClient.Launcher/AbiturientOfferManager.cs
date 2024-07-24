@@ -143,21 +143,21 @@ public class AbiturientOfferManager
     private static double GetPassingScore(ICollection<AbiturientOffer> abiturients, int budgetPlacesCount)
     {
         return abiturients.Any(a => _greenStatuses.Contains(a.Status)) || abiturients.Count >= budgetPlacesCount
-                ? abiturients.LastOrDefault()?.Score ?? -1
-                : -1;
+            ? abiturients.LastOrDefault()?.Score ?? -1
+            : -1;
     }
 
     private static void PrintAbiturients(IEnumerable<AbiturientOffer> abiturients)
     {
-        var result = new StringBuilder();
-        result.AppendLine($"{"Номер", 5} | {"Ім'я", 25} | {"Статус", 15} | {"Пріоритет", 9} | {"Бали", 7} | {"Квота", 22}");
+        Console.WriteLine($"{"Номер", 5} | {"Ім'я", 25} | {"Статус", 15} | {"Пріоритет", 9} | {"Бали", 7} | {"Квота", 22}");
         foreach (var (abiturient, index) in abiturients.Select((a, i)  => (a, i)))
         {
-            result.AppendLine($"{index + 1, 5} | {abiturient.Name, 25} | {abiturient.Status, 15} | {abiturient.Priority, 9} | {abiturient.Score, 7} | " +
-                $"{string.Join(", ", abiturient.Subjects.Select(s => s.Name)),22}");
+            var subjectsString = string.Join(", ", abiturient.Subjects
+                .Where(s => !string.IsNullOrWhiteSpace(s.Name))
+                .Select(s => s.Name));
+            Console.WriteLine($"{index + 1, 5} | {abiturient.Name, 25} | {abiturient.Status, 15} | {abiturient.Priority, 9} | {abiturient.Score, 7} | {subjectsString, 22}");
         }
-        result.AppendLine("---------------------------------------------------------------------------------");
-        Console.WriteLine(result.ToString());
+        Console.WriteLine("---------------------------------------------------------------------------------");
         //var filePath = Path.GetTempFileName();
         //Console.WriteLine(filePath);
         //using (var sw = new StreamWriter(filePath))
@@ -175,7 +175,6 @@ public class AbiturientOfferManager
         int step = 3;
         int prioritiesCount = 5;
 
-        var abiturientsFiltered = abiturients.Where(a => a.Priority <= priorityLowerBound);
         while (higherBound <= maxScore)
         {
             var statsByPriority = new int[prioritiesCount];
