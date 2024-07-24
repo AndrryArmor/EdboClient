@@ -29,7 +29,7 @@ public class AbiturientOfferManager
         abiturients.RemoveAll(a => a.Priority == 0);
         // Сортування за спаданням
         abiturients.Sort((x, y) => Math.Sign(y.Score - x.Score));
-        //PrintScoreStats(abiturients, 5);
+        //PrintScoreStats(abiturients);
 
         // Співбесіда
         var interviewPassedAbiturients = abiturients
@@ -166,31 +166,55 @@ public class AbiturientOfferManager
         //}
     }
 
-    private static void PrintScoreStats(IEnumerable<AbiturientOffer> abiturients, int priorityLowerBound)
+    private static void PrintScoreStats(IEnumerable<AbiturientOffer> abiturients)
     {
-        var result = new StringBuilder();
-        List<(int LowerBound, int HigherBound, int Count)> scoreStats = [];
+        List<ScoreStatsRow> scoreStats = [];
         int lowerBound = 100;
         int higherBound = 104;
         int maxScore = 200;
         int step = 3;
+        int prioritiesCount = 5;
 
         var abiturientsFiltered = abiturients.Where(a => a.Priority <= priorityLowerBound);
         while (higherBound <= maxScore)
         {
-            int abiturientsCount = abiturientsFiltered.Count(a => lowerBound < a.Score && a.Score <= higherBound);
-            scoreStats.Add((lowerBound, higherBound, abiturientsCount));
+            var statsByPriority = new int[prioritiesCount];
+            var abiturientsInStatsRow = abiturients.Where(a => lowerBound < a.Score && a.Score <= higherBound);
+            for (int priority = 1; priority <= prioritiesCount; priority++)
+            {
+                statsByPriority[priority - 1] = abiturientsInStatsRow.Count(a => a.Priority == priority);
+            }
+
+            scoreStats.Add(new (lowerBound, higherBound, statsByPriority));
             lowerBound = higherBound;
             higherBound += step;
         }
 
-        int maxCount = scoreStats.Max(s => s.Count);
+        List<ConsoleColor> priorityColors = [ConsoleColor.White, ConsoleColor.Blue, ConsoleColor.Cyan, ConsoleColor.DarkYellow, ConsoleColor.DarkRed];
         scoreStats.ForEach(s =>
         {
-            result.AppendLine($"{s.LowerBound}-{s.HigherBound} | {s.Count, 3} | {new string('█', s.Count)}");
+            var abiturientsCount = s.StatsByPriority.Aggregate((left, right) => left + right);
+            Console.Write($"{s.LowerBound}-{s.HigherBound} | {abiturientsCount, 3} | ");
+
+            for (int i = 0; i < s.StatsByPriority.Length; i++)
+            {
+                var priorityCount = s.StatsByPriority[i];
+                var statsPart = new string(' ', priorityCount);
+                if (priorityCount > 0)
+                {
+                    var value = priorityCount.ToString();
+                    statsPart = string.Concat(statsPart.Take(statsPart.Length - value.Length)) + value;
+                }
+
+                Console.BackgroundColor = priorityColors[i];
+                Console.ForegroundColor = ConsoleColor.Black;
+                Console.Write(statsPart);
+            }
+
+            Console.ResetColor();
+            Console.WriteLine();
         });
-        result.AppendLine("---------------------------------------------------------------------------------");
-        Console.WriteLine(result.ToString());
+        Console.WriteLine("---------------------------------------------------------------------------------");
     }
 
     private static async Task<IEnumerable<AbiturientOffer>> GetAbiturients(string specialityCode)
@@ -243,4 +267,6 @@ public class AbiturientOfferManager
 
         return null;
     }
+
+    public record ScoreStatsRow(int LowerBound, int HigherBound, int[] StatsByPriority);
 }
